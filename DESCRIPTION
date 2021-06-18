@@ -1,0 +1,27 @@
+Package: KINATESTID
+Type: Package
+Title: A Pipeline for Kinase-Specific Artificial Peptide Design
+Version: 2.0.1
+Date: 2021-06-06
+Authors@R: c(
+    person("Erica D.", "Pratt", email = "pratte@umn.edu", role = c("aut", "cre")),
+    person("John B.", "Blankenhorn", email = "blank121@umn.edu", role = c("aut")),
+    person("Laurie L.", "Parker", email = "llparker@umn.edu", role = c("aut")))
+Description: This pipeline employs a combination of curated collections of 
+    known endogenous substrate sequences and data from phosphoproteomics-
+    informed kinase assays to develop an in silico peptide library. This 
+    library is used for systematic identification of position-specific 
+    amino acid preferences. These preferences inform the design of artificial
+    candidate sequences optimized for kinase-specific performance which can
+    then be characterized in vitro or in vivo.
+Depends: R (>= 3.5.0), devtools, cowplot, cutpointr, data.table,
+        EnhancedVolcano, ggplot2, ggplotify, pheatmap, patchwork,
+        reshape2, RColorBrewer, VennDiagram, stringr
+Suggests: rmarkdown, knitr
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2021-06-11 18:16:00 UTC; Administrator
+Author: Erica D. Pratt [aut, cre],
+  John B. Blankenhorn [aut],
+  Laurie L. Parker [aut]
+Maintainer: Erica D. Pratt <pratte@umn.edu>
