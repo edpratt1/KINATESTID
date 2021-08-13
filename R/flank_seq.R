@@ -26,7 +26,6 @@ generate_flank_seq <- function(central_ptm, peptide_split, peptide_length){
 }
 
 peptide_align<- function(file_dt, ptm_aa){
-  # aa_cols <- c(paste0("-", rev(seq(1:7))), "0", paste0(seq(1:7)))
   aa_dt <- data.table(matrix(ncol=15, nrow=0))
   peptide_colname = "peptides"
   centered_peptides <- list()

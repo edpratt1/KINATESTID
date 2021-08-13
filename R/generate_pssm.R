@@ -1,18 +1,21 @@
-substrate_fisher_test <- function(substrates_dt, uniprot_dt, type = 
-                                 c("aa", "aa_property"), property = 
-                                 c("property_chemical", "property_hydropathy", 
-                                 "property_volume", "property_polar")){
+substrate_fisher_test <- function(substrates_dt, uniprot_dt, 
+                                  type = c("aa", "aa_property"), 
+                                  property = c("property_chemical", 
+                                               "property_hydropathy", 
+                                               "property_volume", 
+                                               "property_polar", 
+                                               "property_charge")){
   type <- match.arg(type)
-  property <- match.arg(property)
+  if (type == "aa_property"){
+    property <- match.arg(property)
+  }
   
   if (type == "aa"){
     aa_rows <- aa_freq(substrates_dt)[[1]]
-    # aa_cols <- c(paste0("-", rev(seq(1:7))), "0", paste0(seq(1:7)))
     sub_freq <- aa_freq(substrates_dt)
     uniprot_freq <- aa_freq(uniprot_dt)
     uniprot_freq <- uniprot_freq[aa %in% sub_freq[, aa]]
   }else{
-    # aa_cols <- c(paste0("-", rev(seq(1:7))), "0", paste0(seq(1:7)))
     sub_freq <- aa_property_freq(substrates_dt, property)
     aa_rows <- sub_freq[[1]]
     uniprot_freq <- aa_property_freq(uniprot_dt, property)
@@ -52,7 +55,6 @@ substrate_fisher_test <- function(substrates_dt, uniprot_dt, type =
 }
 
 aa_freq <- function(substrates_dt){
-  # aa_cols <- c(paste0("-",rev(seq(1:7))),"0", paste0(seq(1:7)))
   pseudo_count <- 1
   substrate_melt <- unique(data.table(melt(substrates_dt,id.vars = 
                           c("substrate_barcode"), measure.vars = aa_cols, 
@@ -65,12 +67,14 @@ aa_freq <- function(substrates_dt){
   return(substrate_cast)
 }
 
-aa_property_freq <- function(substrates_dt, property = c("property_chemical", 
-                            "property_hydropathy", "property_volume", 
-                            "property_polar")){
+aa_property_freq <- function(substrates_dt, 
+                             property = c("property_chemical",
+                                          "property_hydropathy", 
+                                          "property_volume", 
+                                          "property_polar",
+                                          "property_charge")){
   property <- match.arg(property)
   
-  # aa_cols <- c(paste0("-",rev(seq(1:7))),"0", paste0(seq(1:7)))
   substrate_melt<- unique(data.table(melt(substrates_dt,id.vars = 
                          c("substrate_barcode"), measure.vars = aa_cols, 
                          value.name = "aa")))

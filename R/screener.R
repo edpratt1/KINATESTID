@@ -1,27 +1,39 @@
-multi_screener <- function(screener_raw, screener_uniprot, path, method = 
-                          c("prod", "log2_sum", "w_prod"), pval_corr = FALSE, 
-                          type = "aa", property = NULL, constrain = NULL){
+multi_screener <- function(screener_input, 
+                           uniprot_input, 
+                           path, 
+                           method = c("prod", "log2_sum", "w_prod"), 
+                           pval_corr = FALSE, 
+                           type = "aa", 
+                           norm_method = c("none", "bkgrnd"),
+                           property = NULL, 
+                           constrain = NULL){
   method <- match.arg(method)
+  norm_method <- match.arg(norm_method)
   
   if (is.null(constrain)){
     constrain = 0.9
   }
-  n_kinases <- unique(screener_raw[, kinase])
-  
-  message("Generating scoring matrix...\n")
+  n_kinases <- unique(screener_input[, kinase])
+  pb <- txtProgressBar(min = 0, 
+                       max = length(n_kinases), 
+                       initial = 0, 
+                       style = 3)
+  message("\nGenerating scoring matrix...\n")
   
   score_matrix <- 
     lapply(
-      n_kinases,
+      seq_along(n_kinases),
       function(x) {
-        make_scorematrix(screener_raw[kinase == x],
-          screener_uniprot[uniprot_id %in% 
-            screener_raw[kinase == x][, uniprot_id]],
+        setTxtProgressBar(pb, x)
+        output <- make_scorematrix(screener_input[kinase == n_kinases[x]],
+          uniprot_input[uniprot_id %in% screener_input[kinase == n_kinases[x]][, uniprot_id]],
           method,
-          pval_corr = FALSE,
+          pval_corr,
           type,
+          norm_method,
           property
         )
+        return(output)
       }
     )
   
@@ -31,16 +43,19 @@ multi_screener <- function(screener_raw, screener_uniprot, path, method =
   all_score <- lapply(score_matrix, "[[", 2)
   all_score <- rbindlist(Map(cbind, all_score, kinase = n_kinases))
   
-  message("Calculating cutpoints...\n")
-  cp<- cutpointr::cutpointr(data = all_score, x = score, class = type, 
+  message("\nCalculating cutpoints...\n")
+  cp<- cutpointr::cutpointr(data = all_score, 
+                            x = score, 
+                            class = type, 
                             subgroup = kinase, 
-                            pos_class = "sample", neg_class = "bkgrnd",
+                            pos_class = "sample", 
+                            neg_class = "bkgrnd",
                             direction = ">=", 
                             use_midpoints = TRUE, 
                             method = maximize_boot_metric, 
                             boot_stratify = TRUE, 
-                            boot_cut = 10, 
-                            boot_runs = 50,
+                            boot_cut = 30, 
+                            boot_runs = 10,
                             metric = sens_constrain, 
                             constrain_metric = specificity,
                             min_constrain = constrain)
@@ -59,28 +74,52 @@ multi_screener <- function(screener_raw, screener_uniprot, path, method =
     facet_wrap(~kinase, scales = "free") +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, vjust = 0.8))
-                        
+  
+  cp_point <- data.table(subgroup = n_kinases, 
+                         sens = cp$sensitivity, 
+                         spec = 1- cp$specificity,
+                         auc = round(cp$AUC, 2))
+  
+  roc_plot <- plot_roc(cp, display_cutpoint = FALSE) + 
+    geom_point(data = cp_point, aes(x = spec, y = sens, group = subgroup), 
+               col = "black") +
+    geom_text(data = cp_point, aes(x = 0.75, y = 0.1, label = auc)) +
+    theme_minimal() + 
+    theme(axis.text = element_text(size = 10, face = "bold"),
+          axis.text.x = element_text(angle = 45),
+          axis.title = element_text(size = 12, face = "bold"),
+          legend.position = "none") +
+    facet_wrap(~subgroup) 
+  
   all_score <- merge(all_score,table_cp, by = "kinase")
   
   score_quantile <-
     data.table::data.table(t(rbind(
       mapply(function(x) {
-        all_score[!is.infinite(score) & kinase == x][, c(max(.SD), min(.SD)),
-          .SDcols = "score"
-        ]
-      }, n_kinases),
+        all_score[!is.infinite(score) & 
+                    kinase == x][, c(max(.SD), min(.SD)), .SDcols = "score"]
+      }, 
+      n_kinases),
       mapply(function(x) {
-        all_score[!is.infinite(score) & score >
-          cutpoint & kinase == x][, quantile(.SD,
-          probs = c(0.1, 0.5, 0.9),
-          na.rm = TRUE
-        ), .SDcols = "score"]
-      }, n_kinases)
+        all_score[!is.infinite(score) & 
+                    score > cutpoint & 
+                    kinase == x][, quantile(.SD, probs = c(0.1, 0.5, 0.9),
+                                            na.rm = TRUE
+                                            ), .SDcols = "score"]
+        }, 
+        n_kinases)
     )))
   
   colnames(score_quantile) <- c("max", "min", "Q10", "Q50","Q90")
   score_quantile$kinase <- n_kinases
   score_quantile <- merge(table_cp, score_quantile, by = "kinase")
+  
+  if (norm_method == "bkgrnd"){
+    score_quantile <- merge(score_quantile,
+                            unique(all_score[, .(bkgrnd_mean, bkgrnd_sd), 
+                                             by = kinase]),
+                            by = "kinase")
+  }
   
   all_pssm <- merge(all_pssm, table_cp, by = "kinase")
   
@@ -92,14 +131,35 @@ multi_screener <- function(screener_raw, screener_uniprot, path, method =
   
   ggsave("screener_cutpoints.jpg", cutpoint_plot, width = 8, height= 5.5, 
          units = c("in"), path = output_dir)
+
+  ggsave("roc.jpg", roc_plot, width = 8, height= 5.5, 
+         units = c("in"), path = output_dir)
   
-  output <- list(cutpoint_plot, all_pssm, score_quantile)
+  norm_tbl <- 
+    data.table::data.table(reshape2::dcast(
+      all_score[, sum(str_count(substrate_barcode, "Y")), 
+                by = .(kinase, type)], 
+      kinase ~ type, 
+      value.var = "V1"))
+  norm_tbl[, norm:= bkgrnd/sample]
+  
+  settings <- list(method = method, 
+                   pval_corr = pval_corr, 
+                   type = type, 
+                   norm_method = norm_method, 
+                   property = property)
+  
+  output <- list(cutpoint_plot, all_pssm, score_quantile, settings)
   return(output)
 }
 
-screener_cutpoint <- function(kinase_dt, kinase_uniprot, method = c("prod", 
-                             "log2_sum", "w_prod"), pval_corr = FALSE, 
-                             type = "aa", property = NULL, constrain = NULL){
+screener_cutpoint <- function(kinase_dt, 
+                              kinase_uniprot, 
+                              method = c("prod", "log2_sum", "w_prod"), 
+                              pval_corr = FALSE, 
+                              type = "aa",
+                              property = NULL, 
+                              constrain = NULL){
   method <- match.arg(method)
   
   if (is.null(constrain)){
@@ -149,21 +209,28 @@ make_scorematrix <- function(kinase_dt, kinase_uniprot,
                              method = c("prod", "log2_sum", "w_prod"), 
                              pval_corr = FALSE, 
                              type = "aa",
-                             property = NULL){
+                             norm_method = c("none", "bkgrnd"),
+                             property = NULL,
+                             verbose = FALSE){
   method <- match.arg(method)
-  # aa_cols <- c(paste0("-",rev(seq(1:7))),"0", paste0(seq(1:7)))
-  
+  norm_method <- match.arg(norm_method)
+
   kinase_cd <- unique(kinase_dt[, kinase])
   
   kinase_fisher <- substrate_fisher_test(kinase_dt, kinase_uniprot, type, property)
-  valid_cols <- which(apply(kinase_fisher[[2]], 2, function(x) 
-                     length(unique(x)) != 1)) #remove columns where there is no data
+  valid_cols <- which(apply(kinase_fisher[[2]], 
+                            2, 
+                            function(x){ 
+                              length(unique(x)) != 1
+                              }
+                            )
+                      ) #remove columns where there is no data
   kinase_fisher <- lapply(kinase_fisher, function(x) x[, valid_cols])
   kinase_fisher_melt <- fisher_long(kinase_fisher)
   
   kinase_score_dt <- 
       na.omit(unique(
-        data.table::melt(kinase_dt[,.(uniprot_id, substrate_barcode), 
+        data.table::melt(kinase_dt[, .(uniprot_id, substrate_barcode), 
                                    by = aa_cols], 
                          id.vars = c("uniprot_id", "substrate_barcode"), 
                          variable.name = c("flank_pos"), 
@@ -176,11 +243,11 @@ make_scorematrix <- function(kinase_dt, kinase_uniprot,
     na.omit(unique(
       data.table::melt(kinase_uniprot[, .(uniprot_id, substrate_barcode), 
                                       by=aa_cols],
-                       id.vars=c("uniprot_id", "substrate_barcode"), 
+                       id.vars = c("uniprot_id", "substrate_barcode"), 
                        variable.name = c("flank_pos"), 
                        value.name = "amino_acid")))
   
-  kinase_bkgrnd_score_dt[, barcode:=paste0(amino_acid, ":", flank_pos)]
+  kinase_bkgrnd_score_dt[, barcode:= paste0(amino_acid, ":", flank_pos)]
   kinase_bkgrnd_score_dt[, type:= as.factor("bkgrnd")]
   
   all_score_dt <- rbind(kinase_score_dt, kinase_bkgrnd_score_dt)
@@ -191,7 +258,7 @@ make_scorematrix <- function(kinase_dt, kinase_uniprot,
                           by.x= "amino_acid", by.y = "aa")
     
     all_score_dt[, barcode:= lapply(.SD, function(x) paste0(x, ":", flank_pos)),
-                 .SDcols=property]
+                 .SDcols = property]
   }
   
   all_score_dt <- 
@@ -204,7 +271,7 @@ make_scorematrix <- function(kinase_dt, kinase_uniprot,
     kinase_fisher_melt[, fisher_odds:= ifelse(fisher_pval > 0.05, 1, fisher_odds)]
   }
 
-  if(method == "w_prod"){
+  if (method == "w_prod"){
     all_score_dt[, score:= get_score(fisher_odds, method, fisher_pval), 
                  by = substrate_barcode]
   }else{
@@ -212,15 +279,38 @@ make_scorematrix <- function(kinase_dt, kinase_uniprot,
                  by = substrate_barcode]
   }
   
-  unique_all_score_dt <- unique(all_score_dt[,score, by = .(
-                                substrate_barcode, type)])
-  
-  output <- list(kinase_fisher_melt, unique_all_score_dt)
-  return(output)
+  if (norm_method == "bkgrnd"){
+    all_score_dt <- cbind(all_score_dt, 
+                          unique(all_score_dt[type == "bkgrnd"], 
+                                 by = c("substrate_barcode", 
+                                        "score"))[, .(
+                            bkgrnd_mean = mean(score), 
+                            bkgrnd_sd = sd(score))])
+    
+    all_score_dt[, score:= (score - bkgrnd_mean) / bkgrnd_sd]
+    
+    unique_all_score_dt <- unique(all_score_dt[, score, 
+                                               by = .(substrate_barcode, 
+                                                      type, 
+                                                      bkgrnd_mean, 
+                                                      bkgrnd_sd)]
+                                  )
+  }else{
+    unique_all_score_dt <- unique(all_score_dt[,score, 
+                                               by = .(substrate_barcode, 
+                                                      type)]) 
+    }
+
+  if (isTRUE(verbose)){
+    output <- all_score_dt
+    return(output)
+  }else{
+    output <- list(kinase_fisher_melt, unique_all_score_dt)
+    return(output)
+  }
 }
 
 make_screener <- function(){
-  # aa_cols <- c(paste0("-",rev(seq(1:7))),"0", paste0(seq(1:7)))
   path <- choose.dir()
   filenames<- toupper(list.files(path = path, full.names=T))
   screener_list <- lapply(filenames, function(x) fread(x, 

@@ -301,7 +301,9 @@ screener <- multi_screener(screener_raw, screener_uniprot,
                            path = output_dir,
                            method = "prod",
                            pval_corr = FALSE,
-                           type = "aa")
+                           type = "aa",
+                           norm_method = "none",
+                           constrain = 0.95)
 ```
 
 For each kinase, an optimal threshold will be calculated to separate the 

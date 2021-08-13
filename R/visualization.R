@@ -9,7 +9,7 @@ substrates_qc <- function(substrates_dt, path){
   
   venn_data <- peptide_intersect(substrates_dt)
   
-  sub_heatmap <- substrates_freq(unique_substrates, T)
+  sub_heatmap <- substrates_heatmap(unique_substrates, T)
   
   counts_dt <- unique(substrates_dt[,substrate_barcode,by=.(file_name, class)])
   counts_graph <- ggplot(counts_dt, aes(x = file_name, fill = class)) + 
@@ -175,22 +175,32 @@ substrates_heatmap <- function(substrates_dt, scramble = FALSE, seed = NULL){
 
 silico_heatmap <- function(output_dt){
   dm_palette <- colorRampPalette(c("#FFFFFF", "#FFB7B4", "#FF6361", "#FF3127"))
-  key <- data.table(perf = c("inactive", "low", "medium", "high"), color = c(0, 1, 2, 3))
+  key <- data.table::data.table(perf = c("inactive", "low", "medium", "high"), 
+                                color = c(0, 1, 2, 3))
   
-  output_dt$perf <- factor(output_dt$perf, levels = c("inactive", "low", "medium", "high"))
+  output_dt$perf <- factor(output_dt$perf, 
+                           levels = c("inactive", "low", "medium", "high"))
   output_merge <- merge(output_dt, key, by = "perf")
-  dm_rownames <- dcast(output_merge, substrate_barcode ~ kinase, value.var = "color")[,1]
-  dm <- data.matrix(dcast(output_merge, substrate_barcode ~ kinase, value.var = "color", value.factor=TRUE)[,-1])
+  dm_rownames <- reshape2::dcast(output_merge, 
+                                 substrate_barcode ~ kinase, 
+                                 value.var = "color")[, 1]
+  dm <- data.matrix(reshape2::dcast(output_merge, 
+                                    substrate_barcode ~ kinase, 
+                                    value.var = "color", 
+                                    value.factor = TRUE)[,-1])
   rownames(dm) <- dm_rownames
-  dm_plot <- pheatmap(t(dm), cluster_rows = FALSE, cluster_cols = FALSE, color = dm_palette(5))
+  dm_plot <- pheatmap(t(dm), 
+                      cluster_rows = FALSE, 
+                      cluster_cols = FALSE, 
+                      color = dm_palette(5))
   dm_plot <- as.ggplot(dm_plot)
 }
 
 
 plot_activity<- function(output_dt, kinase_set){
   output_dt$perf <- as.factor(output_dt$perf)
-  output_dt$perf <- factor(output_dt$perf, levels = c("inactive", "low", 
-                          "medium", "high"))
+  output_dt$perf <- factor(output_dt$perf, 
+                           levels = c("inactive", "low", "medium", "high"))
   output_dt$kinase <- droplevels(output_dt$kinase)
   output_dt$kinase <- factor(output_dt$kinase, levels = 
                             kinase_set[kinase_set %in% output_dt[,kinase]])
@@ -213,14 +223,20 @@ substrates_property <- function(substrates_dt, uniprot_dt, path){
   for (i in 1:length(property)){
     fisher_tables <- substrate_fisher_test(substrates_dt, uniprot_dt, 
                                            "aa_property", property[i])
-    fisher_melt <- melt(fisher_tables[[2]], varnames = 
-                       c("property","flank_pos"), value.name = "fisher_odds")
-    fisher_plot <- ggplot(fisher_melt, aes(x = flank_pos, y = fisher_odds, 
-                         colour = property)) + geom_point(size = 2) + 
-                         facet_wrap(~property, scales = "free_x", ncol = 2) + 
-                         geom_line(size = 1) + geom_hline(yintercept = 1, 
-                         linetype = "dashed") + theme_bw() + xlab("") + ylab(
-                         "Fisher Odds") + theme(legend.position = "none")
+    fisher_melt <- melt(fisher_tables[[2]], 
+                        varnames = c("property","flank_pos"), 
+                        value.name = "fisher_odds")
+    fisher_plot <- 
+      ggplot(fisher_melt, aes(x = flank_pos, y = fisher_odds, colour = property)) +
+      geom_point(size = 2) + 
+      facet_wrap(~property, scales = "free_x", ncol = 2) +
+      geom_line(size = 1) + 
+      geom_hline(yintercept = 1, linetype = "dashed") + 
+      theme_bw() +
+      xlab("") +
+      ylab("Fisher Odds") +
+      theme(legend.position = "none")
+    
     property_plots[[i]] <- fisher_plot
     property_tables[[i]] <- fisher_tables
   }

@@ -1,6 +1,10 @@
-generate_substrates <- function(fisher_tables, uniprot_dt, screener_dt, target_kinase, 
-                               method = c("prod", "log2_sum", "w_prod"), 
-                               screening_kinase = "ALL", n_hits = NULL){
+generate_substrates <- function(fisher_tables, 
+                                uniprot_dt, 
+                                screener_dt, 
+                                target_kinase, 
+                                method = c("prod", "log2_sum", "w_prod"), 
+                                screening_kinase = "ALL", 
+                                n_hits = NULL){
   if (is.null(n_hits)){
     n_hits = 10
   }
@@ -8,23 +12,24 @@ generate_substrates <- function(fisher_tables, uniprot_dt, screener_dt, target_k
   fisher_candidates <- get_candidateaa(fisher_tables, screener_dt, target_kinase)
   candidate_matrix <- score_candidates(fisher_candidates, screener_dt, method, 
                                        screening_kinase)
-  spec_barcodes <- candidate_matrix[[1]][kinase == target_kinase & n_active == 
-                                        min(n_active) & active == "TRUE"][, 
-                                        substrate_barcode]
+  spec_barcodes <- candidate_matrix[[1]][kinase == target_kinase & 
+                                           n_active == min(n_active) &
+                                           active == "TRUE"][, substrate_barcode]
   
   top_barcodes <- candidate_matrix[[1]][substrate_barcode %in% spec_barcodes & 
                                        kinase != target_kinase][, sum(score), 
                                        by = substrate_barcode][order(V1)][1:n_hits, 
                                        substrate_barcode]
   
-  output <- list(candidate_aa = fisher_candidates, candidate_matrix[[1]], 
-                 candidate_matrix[[2]], top_hits = candidate_matrix[[2]][
-                 substrate_barcode %in% top_barcodes])
+  output <- list(candidate_aa = fisher_candidates, 
+                 candidate_matrix[[1]], 
+                 candidate_matrix[[2]], 
+                 top_hits = candidate_matrix[[2]][substrate_barcode %in% top_barcodes])
   return(output)
 }
 
 get_candidateaa <- function(fisher_tables, screener_dt, target_kinase){
-  # aa_cols <- c(paste0("-",rev(seq(1:7))),"0", paste0(seq(1:7)))
+  max_perm <- 250000
   ptm_pos <- paste0(names(which.max(fisher_tables[[2]][,8])),":0")
   
   valid_cols <- which(apply(fisher_tables[[2]], 2, function(x) 
@@ -34,11 +39,13 @@ get_candidateaa <- function(fisher_tables, screener_dt, target_kinase){
   fisher_combn <- fisher_long(kinase_fisher)
   fisher_combn[, sig_pos:= sum(fisher_pval <= 0.05), by=flank_pos]
   
-  sig_fav_pssm <- fisher_combn[fisher_pval <= 0.05 & fisher_odds > 1 & 
-                              sig_pos >0][, .(barcode, flank_pos)]
+  sig_fav_pssm <- fisher_combn[fisher_pval <= 0.05 & 
+                                 fisher_odds > 1 &
+                                 sig_pos > 0][, .(barcode, flank_pos)]
   
-  sig_disfav_pssm <- fisher_combn[fisher_pval <= 0.05 & fisher_odds < 1 & 
-                                 sig_pos >0][, .(barcode, flank_pos)]
+  sig_disfav_pssm <- fisher_combn[fisher_pval <= 0.05 & 
+                                    fisher_odds < 1 &
+                                    sig_pos > 0][, .(barcode, flank_pos)]
   
   if (target_kinase %in% screener_dt[[2]][, kinase]){
     sig_fav_screener <- screener_dt[[2]][kinase == target_kinase & 
@@ -59,15 +66,18 @@ get_candidateaa <- function(fisher_tables, screener_dt, target_kinase){
   
   aa_spec <- setdiff(aa_cols, c(sig_fav_all[, flank_pos], "0"))
   
-  disfav_screener <- screener_dt[[2]][kinase != target_kinase & flank_pos %in% 
-                                     aa_spec & fisher_odds < 1][, .(
-                                     length(fisher_odds), mean(fisher_odds, 
-                                     na.rm = T)), by = .(barcode, flank_pos)]
+  disfav_screener <- screener_dt[[2]][kinase != target_kinase & 
+                                        flank_pos %in% aa_spec & 
+                                        fisher_odds < 1][, .(
+                                     length(fisher_odds), 
+                                     mean(fisher_odds, 
+                                     na.rm = T)), 
+                                     by = .(barcode, flank_pos)]
   
   if (target_kinase %in% screener_dt[[2]][, kinase]){
-    kinase_crossref <- screener_dt[[2]][kinase == target_kinase & barcode %in% 
-                                       disfav_screener[, barcode] & 
-                                       fisher_odds < 1][, barcode]
+    kinase_crossref <- screener_dt[[2]][kinase == target_kinase & 
+                                          barcode %in% disfav_screener[, barcode] & 
+                                          fisher_odds < 1][, barcode]
     disfav_screener <- disfav_screener[!barcode %in% kinase_crossref]
   }
   
@@ -75,7 +85,8 @@ get_candidateaa <- function(fisher_tables, screener_dt, target_kinase){
                                     by = flank_pos]
   
   fav_pssm <- fisher_combn[barcode %in% disfav_screener[, barcode] & 
-                             fisher_odds > 1 & !barcode %in% sig_disfav_all | 
+                             fisher_odds > 1 & 
+                             !barcode %in% sig_disfav_all | 
                              barcode %in% sig_fav_all[, barcode]]
   
   ptm_pssm <- fisher_combn[barcode == ptm_pos]
@@ -86,32 +97,47 @@ get_candidateaa <- function(fisher_tables, screener_dt, target_kinase){
   
   if (length(aa_nomatch) > 0){
     pssm_nomatch <- fisher_combn[flank_pos %in% aa_nomatch][, 
-                                fisher_odds*1/fisher_pval, by = .(
-                                amino_acid, flank_pos, barcode)][, .SD[
-                                V1 %in% rev(sort(V1))[1:3]], by = .(
-                                flank_pos)][, barcode]
+                                fisher_odds* 1/ fisher_pval, 
+                                by = .(amino_acid, flank_pos, barcode)][, .SD[
+                                V1 %in% rev(sort(V1))[1:3]], 
+                                by = .(flank_pos)][, barcode]
     aa_candidates <- rbind(aa_candidates, fisher_combn[barcode %in% pssm_nomatch])
   }
+  
+  perm <- aa_candidates[, length(unique(amino_acid)), by = flank_pos][, prod(V1)]
+  if (perm > max_perm){
+    msg <- paste0("Max number of permutations (", max_perm, 
+                  ") exceeded. Curate manually (y/n)?")
+    manual <- askYesNo(msg, 
+                       default = TRUE, 
+                       prompts = getOption("askYesNo", gettext(c("Y/N/C"))))  
+    if(isTRUE(manual)){
+      aa_candidates <- get_manualcandidateaa(aa_candidates)
+    }else{
+      stop("Maximum number of permutations exceeded. Stopping...")
+    }
+  }
+  
   return(aa_candidates)
 }
 
 score_candidates <- function(fisher_candidates, screener_dt, method = 
                             c("prod", "log2_sum", "w_prod"), kinase = "ALL"){
-  candidate_aa <- split(fisher_candidates[, amino_acid], fisher_candidates[, 
-                     flank_pos])
-  
+  candidate_aa <- split(fisher_candidates[, amino_acid], 
+                        fisher_candidates[, flank_pos], 
+                        drop = TRUE)  
   cat("\nCreating substrate permutations...")
-  new_substrates <- do.call(expand.grid,candidate_aa)
+  new_substrates <- do.call(expand.grid, candidate_aa)
   
   new_substrates <- reshape2::melt(t(new_substrates), varnames = c("flank_pos", 
                                   "substrate_barcode"), value.name = 
                                   "amino_acid")
   new_substrates <- data.table(new_substrates)
   new_substrates[, barcode:= paste0(amino_acid, ":", flank_pos)]
-  new_substrates<- merge(fisher_candidates[, .(fisher_odds), by = barcode], 
+  new_substrates<- merge(fisher_candidates[, .(fisher_odds, fisher_pval), by = barcode], 
                          new_substrates, by = "barcode")
   
-  cat("\nScoring candidate sequences...")
+  cat("\nScoring candidate sequences...\n")
   
   if (method == "w_prod"){
     new_substrates[, raw_score:= get_score(fisher_odds, method, fisher_pval), 
@@ -163,7 +189,7 @@ get_normscores <- function(candidates, screener_dt, n_hits = NULL){
 }
 
 norm_scores <- function(scoretable, screener_dt){
-  score_quantile <- screener[[3]]
+  score_quantile <- screener_dt[[3]]
   
   map_table <- data.table(merge(scoretable, score_quantile, 
                          by = c("kinase", "cutpoint"), all = T))
@@ -171,7 +197,7 @@ norm_scores <- function(scoretable, screener_dt){
                                      log(min))*(100), 0), by = kinase]
   scaled_hits <- reshape2::dcast(map_table, substrate_barcode ~ kinase, 
                        value.var = "converted_score")
-  scaled_threshold <- data.table(screener[[3]])[,round((log(cutpoint) - 
+  scaled_threshold <- data.table(screener_dt[[3]])[, round((log(cutpoint) - 
                                 log(min))/(log(max) - log(min))*(100),0), 
                                 by = kinase]
   setnames(scaled_threshold, "V1", "norm_thresholds")

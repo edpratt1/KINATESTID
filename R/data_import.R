@@ -38,7 +38,6 @@ multi_sample <- function(path, ptm_type = c("Oxidation (M)-M", "Carbamidomethyla
   cntrl_key <- "MINUS"
   substrate_key <- "SUBSTRATE"
   freq_key <- c("SBF", "FREQ")
-  # aa_cols <- c(paste0("-",rev(seq(1:7))),"0", paste0(seq(1:7)))
   ascore_cutoff <- 30
   
   # path <- choose.dir()
@@ -88,15 +87,13 @@ multi_sample <- function(path, ptm_type = c("Oxidation (M)-M", "Carbamidomethyla
 }
 
 parse_sample_name <- function(sample_paths){
-  sample_subpaths <- read.table(
-    text=sample_paths,sep="/", colClasses="character"
-  )
+  sample_subpaths <- read.table(text = sample_paths,
+                                sep = "/", 
+                                colClasses="character")
   sample_names <- sample_subpaths[,ncol(sample_subpaths)]
 }
 
 add_barcode <- function(substrates_dt, freq = FALSE, legacy = FALSE){
-  # aa_cols <- c(paste0("-",rev(seq(1:7))),"0", paste0(seq(1:7)))
-  
   substrate_aa<- substrates_dt[,.SD, .SDcols = aa_cols]
   substrate_barcode <- apply(substrate_aa, 1, paste0, collapse = "")
   substrate_sampleid <- paste0(substrates_dt[,1], substrate_barcode)
@@ -105,13 +102,17 @@ add_barcode <- function(substrates_dt, freq = FALSE, legacy = FALSE){
   if (isTRUE(freq)){
     if (isTRUE(legacy)){
       unique_substrate_dt <- unique(substrates_dt[, -c("Reference")])
-      barcode_freq <- dcast(unique_substrate_dt, substrate_barcode~class, fun.aggregate =
-                              length, value.var = "substrate_barcode") 
+      barcode_freq <- 
+        data.table(reshape2::dcast(unique_substrate_dt, substrate_barcode ~ class,
+                                   fun.aggregate = length, 
+                                   value.var = "substrate_barcode")) 
     }else{
       unique_substrate_dt <- unique(substrates_dt[, substrate_barcode, by = .(
                                    replicate, class)])
-      barcode_freq <- dcast(unique_substrate_dt, substrate_barcode ~ class, 
-                            fun.aggregate = length, value.var = "substrate_barcode")
+      barcode_freq <- 
+        data.table(reshape2::dcast(unique_substrate_dt, substrate_barcode ~ class, 
+                            fun.aggregate = length, 
+                            value.var = "substrate_barcode"))
       if (!"control" %in% colnames(barcode_freq)){
         barcode_freq[, control:= 0]
       }

@@ -1,7 +1,7 @@
 Package: KINATESTID
 Type: Package
 Title: A Pipeline for Kinase-Specific Artificial Peptide Design
-Version: 2.0.1
+Version: 2.0.2
 Date: 2021-06-06
 Authors@R: c(
     person("Erica D.", "Pratt", email = "pratte@umn.edu", role = c("aut", "cre")),
@@ -16,7 +16,9 @@ Description: This pipeline employs a combination of curated collections of
     then be characterized in vitro or in vivo.
 Depends: R (>= 3.5.0), devtools, cowplot, cutpointr, data.table,
         EnhancedVolcano, ggplot2, ggplotify, pheatmap, patchwork,
-        reshape2, RColorBrewer, VennDiagram, stringr
+        reshape2, RColorBrewer, VennDiagram, stringr, utils, shiny,
+	DT
+biocViews:
 Suggests: rmarkdown, knitr
 VignetteBuilder: knitr
 NeedsCompilation: no

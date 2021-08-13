@@ -47,7 +47,6 @@ import_uniprot <- function(substrates_dt, uniprot_digest, path){
 
 
 get_uniprot<- function(substrates_dt, uniprot_digest){
-  # aa_cols <- c(paste0("-",rev(seq(1:7))),"0", paste0(seq(1:7)))
   col_order <- c("uniprot_id", "peptide_no", aa_cols)
   ptm_aa <- unique(substrates_dt[, `0`]) 
   
@@ -71,10 +70,11 @@ get_uniprot<- function(substrates_dt, uniprot_digest){
   protein_nomatch <- length(unique(gsub("-.*","", uniprot_nomatch)))
   percent_nomatch <- round(length(uniprot_nomatch) / (length(uniprot_match[,
                           uniprot_id]) + length(uniprot_nomatch))*100, 2)
-  nomatch_msg <- paste0("No match found for ", percent_nomatch, 
-                        "% of uniprot ids (", length(uniprot_nomatch), "/", 
-                        length(substrate_uniprot), "). ", isoform_nomatch, 
-                        " mismatches are protein isoforms. Consider downloading a more complete UniprotKB file.")
+  nomatch_msg <- 
+    paste0("No match found for ", percent_nomatch, "% of uniprot ids (", 
+           length(uniprot_nomatch), "/",  length(substrate_uniprot), "). ", 
+           isoform_nomatch, " mismatches are protein isoforms.",  
+           " Consider downloading a more complete UniprotKB file.")
   
   message(nomatch_msg)
   message("\nPTM-centering matching peptides...")
