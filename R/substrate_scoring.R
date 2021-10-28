@@ -1,3 +1,23 @@
+#' Score multiple existing peptide sequences
+#'
+#' @description This function scores provided peptide sequences a 
+#' pre-generated screener file.
+#' 
+#' @param screener_dt A four-element list generated using the
+#'  `multi_screener()` function.
+#'  
+#' @param candidates_dt A data.table of candidate substrate sequences.
+#' 
+#' @param kinase Abbreviation (typically 3 letter) for the enzyme the 
+#' substrate is to be optimized for.
+#' 
+#' @param family A logical indicating whether to screen specifically against 
+#' a kinase family (TRUE) or not (FALSE). The default value is FALSE.
+#'
+#' @return A data.table containing substrate scoring information for each enzyme 
+#' in the provided `screener_dt` file.
+#' @export
+#'
 multi_candidate_screener <- function(screener_dt, 
                                      candidates_dt, 
                                      kinase, 
@@ -15,12 +35,12 @@ multi_candidate_screener <- function(screener_dt,
                        style = 3)
   
   for (i in 1:length(n_candidates)){
+    setTxtProgressBar(pb, i)
     output[[i]] <- peptide_screener(screener_dt, 
                                     candidates_dt[substrate_barcode == 
                                                   n_candidates[i]][, barcode],
                                     kinase,
                                     family)
-    setTxtProgressBar(pb, i)
   }
   names(output) <- paste("substrate_barcode", n_candidates) 
   candidate_hits <- Filter(Negate(is.null), output)
@@ -36,6 +56,29 @@ multi_candidate_screener <- function(screener_dt,
   return(candidate_dt)
 }
 
+#' Score an individual existing peptide sequence
+#'
+#' @description This lower-level function is called within `multi_candidate_screener`. 
+#' End users should use the higher-level function instead.
+#' 
+#' @param screener_dt A four-element list generated using the
+#'  `multi_screener()` function.
+#'  
+#' @param candidates_dt A data.table of candidate substrate sequences.
+#' 
+#' @param kinase Abbreviation (typically 3 letter) for the enzyme the 
+#' substrate is to be optimized for.
+#' 
+#' @param target_kinase Abbreviation (typically 3 letter) for the enzyme the 
+#' substrate is to be optimized for.
+#' 
+#' @param family A logical indicating whether to screen specifically against 
+#' a kinase family (TRUE) or not (FALSE). The default value is FALSE.
+#'
+#' @return A data.table containing substrate scoring information for each enzyme 
+#' in the provided `screener_dt` file.
+#' @export
+#'
 peptide_screener <- function(screener_dt, 
                              candidates_dt, 
                              target_kinase, 
@@ -45,7 +88,7 @@ peptide_screener <- function(screener_dt,
   pval_corr <- screener_dt[[4]]$pval_corr
   norm_method <- screener_dt[[4]]$norm_method
   
-  scores_dt <- screener_dt[[2]]
+  scores_dt <- screener_dt[[2]][flank_pos %in% core_aa_cols]
   if (isTRUE(pval_corr)){
     scores_dt[, fisher_odds:= ifelse(fisher_pval > 0.05, 1, fisher_odds)]
   }
@@ -92,16 +135,8 @@ get_score <- function(odds, method = c("prod", "log2_sum", "w_prod"), pval = NUL
     pseudo_count = 1
     score <- sum(log(odds), na.rm = T)
   }else{
-    # pval_inv <- 1/pval
-    # log_pval <- log2(pval_inv)/sum(log2(pval_inv))
-    # w_odds <- mapply(function(x) odds[x]^log_pval[x], seq_along(log_pval))
     w_odds <- mapply(function(x) odds[x]^exp(-pval[x]), seq_along(pval))
-    
     score <- prod(w_odds)
-    # matrix <- data.table(odds, pval)
-    # sig <- matrix[pval <= 0.05][, prod(odds)]
-    # nonsig <- matrix[pval > 0.05][, prod(odds)]
-    # score <- (sig^0.8)*(nonsig^0.2)
   }
   return(score)
 }

@@ -6,7 +6,7 @@ get_manualcandidateaa <- function(fisher_candidates){
 manualcandidateaa_app <- function(fisher_candidates){
   ui <- fluidPage(
     title = 'Select Table Rows',
-    h1('A Server-side Table'),
+    h1('Manual PSSM Selection'),
     fluidRow(
       column(9, DT::dataTableOutput('x3'),
              h4("Selected Amino Acids"),

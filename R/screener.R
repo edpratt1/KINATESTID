@@ -1,3 +1,55 @@
+#' Generate enzyme screener file
+#' 
+#' @description The function multi_screener takes as inputs 1) 
+#' the kinase-specific preferred substrates file and 2) the protein-matched 
+#' in silico control peptide library. For each enzyme, an optimal threshold will
+#' be calculated to separate the peptide scores of sample vs control 
+#' sequences. This is calculated using the package `cutpointr.` A bootstrap model
+#'  is used to select an optimal cutpoint to maximize sensitivity.
+#'    
+#' @param screener_input An enzyme-specific preferred substrates file. 
+#' 
+#' @param uniprot_input The `uniprot_id`-matched in silico control peptide library.
+#' 
+#' @param path  The file path where output data should be saved.
+#' 
+#' @param method Peptide scoring algorithm. Accepts product of odds ratios 
+#' (`prod`), weighted product of odds ratio (`w_prod`), and the sum of 
+#' log scores (`log2_sum`).
+#' 
+#' @param pval_corr A logical parameter where TRUE will set all fisher odds 
+#' with non-significant p-values (> 0.05) to 1. Set to FALSE by default.
+#' 
+#' @param type Character of either `aa` or `aa_property` to indicate whether 
+#' amino acid residues or amino acid properties should be used.
+#' 
+#' @param norm_method Character of either `none` or `bkgrnd` to indicate whether 
+#' raw scores or background-corrected ones should be used. Background-correction
+#' subtracts the mean and divides by the standard deviation of the negative 
+#' control substrate scores.
+#' 
+#' @param property Character indicating which amino acid property should be 
+#' analyzed. Only used if type = `aa`. See available property options 
+#' by typing `aa_classificiation`.
+#' 
+#' @param constrain The minimum specificity required when calculating 
+#' the threshold score for activity. By default set to 0.9.
+#'
+#' @return A three-element list containing: 1) A lot of score distributions and
+#' the selected threshold, 2) Fisher tables for each kinase in the 
+#' `screener_input` file, and 3) Summary stats on score distribution for 
+#' each enzyme.
+#' @export
+#'
+#' @examples
+#' screener <- multi_screener(screener_raw, screener_uniprot, 
+#'                            path = output_dir,
+#'                            method = "prod",
+#'                            pval_corr = FALSE,
+#'                            type = "aa",
+#'                            norm_method = "none",
+#'                            constrain = 0.90)
+#'                            
 multi_screener <- function(screener_input, 
                            uniprot_input, 
                            path, 
@@ -7,6 +59,21 @@ multi_screener <- function(screener_input,
                            norm_method = c("none", "bkgrnd"),
                            property = NULL, 
                            constrain = NULL){
+  
+  file_check <- tryCatch(
+    {
+      check_screener(screener_input)
+      check_uniprot(uniprot_input)
+    },
+    error = function(e){
+      message(e)
+      return(FALSE)
+    })
+  
+  if(!isTRUE(file_check)){
+    return()
+  }
+  
   method <- match.arg(method)
   norm_method <- match.arg(norm_method)
   
@@ -114,6 +181,7 @@ multi_screener <- function(screener_input,
   score_quantile$kinase <- n_kinases
   score_quantile <- merge(table_cp, score_quantile, by = "kinase")
   
+  #This needs to happen BEFORE cp selection
   if (norm_method == "bkgrnd"){
     score_quantile <- merge(score_quantile,
                             unique(all_score[, .(bkgrnd_mean, bkgrnd_sd), 
@@ -122,6 +190,8 @@ multi_screener <- function(screener_input,
   }
   
   all_pssm <- merge(all_pssm, table_cp, by = "kinase")
+  all_pssm <- merge(all_pssm, unique(screener_input[, source, by = kinase]), 
+                    by = "kinase")
   
   output_dir = file.path(path, "output")
   
@@ -236,7 +306,7 @@ make_scorematrix <- function(kinase_dt, kinase_uniprot,
                          variable.name = c("flank_pos"), 
                          value.name = "amino_acid")))
   
-  kinase_score_dt[,barcode:= paste0(amino_acid, ":", flank_pos)]
+  kinase_score_dt[, barcode:= paste0(amino_acid, ":", flank_pos)]
   kinase_score_dt[, type:= as.factor("sample")]
   
   kinase_bkgrnd_score_dt <- 
@@ -251,6 +321,7 @@ make_scorematrix <- function(kinase_dt, kinase_uniprot,
   kinase_bkgrnd_score_dt[, type:= as.factor("bkgrnd")]
   
   all_score_dt <- rbind(kinase_score_dt, kinase_bkgrnd_score_dt)
+  all_score_dt <- all_score_dt[flank_pos %in% core_aa_cols]
   
   if (type == "aa_property"){
     all_score_dt <- merge(all_score_dt, 
@@ -310,14 +381,32 @@ make_scorematrix <- function(kinase_dt, kinase_uniprot,
   }
 }
 
+#' Create new input screener file
+#'
+#' @description This function allows the user to open a single folder containing
+#' all enzyme substrate preference sheets and create a new input file for 
+#' screener creation. The user should also create a new negative control 
+#' input using `import_uniprot`.
+#' 
+#' @return A data.table containing the substrate preferences for all 
+#' enzyme preference files in a selected folder.
+#' @export
+#'
 make_screener <- function(){
+  expt_file_key <- "KALIP"
   path <- choose.dir()
   filenames<- toupper(list.files(path = path, full.names=T))
-  screener_list <- lapply(filenames, function(x) fread(x, 
-                          na.strings = c(""), header = TRUE))
+  
+  screener_list <- lapply(filenames, 
+                          function(x) {
+                            fread(x, na.strings = c(""), header = TRUE)
+                          }
+                         )
+  
   for (i in 1:length(screener_list)){
     screener_list[[i]][, file_name:= parse_sample_name(filenames[i])]
   }
+  
   screener_dt <- rbindlist(screener_list, use.names = TRUE, fill = TRUE)
   screener_dt[, Species:= tolower(Species)]
   screener_dt[, kinase:= as.factor(sub("_.*","",file_name))]
@@ -339,6 +428,7 @@ make_screener <- function(){
                                            aa_cols]
   unique_screener_dt[, class:= as.factor("sample")]
   unique_screener_dt <- unique_screener_dt[Species == "human" | is.na(Species)]
+  unique_screener_dt[, source:= as.factor(ifelse(file_name %like% "KALIP", "EXPT", "LIT"))]
   return(unique_screener_dt)
 }
 

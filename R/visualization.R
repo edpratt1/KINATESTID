@@ -1,3 +1,12 @@
+#' Generate QC report
+#'
+#' @param substrates_dt An enzymatic preference data.table. 
+#' 
+#' @param path The file path where output data should be saved.
+#'
+#' @return A ggplot2 object.
+#' @export
+#'
 substrates_qc <- function(substrates_dt, path){
   unique_substrates <- bkgrnd_corr(substrates_dt)
   bin_dt <- unique(substrates_dt[,substrate_barcode, by = .(sample, control)])
@@ -42,6 +51,13 @@ substrates_qc <- function(substrates_dt, path){
   return(qc_output)
 }
 
+#' Find peptide commonality across replicates
+#'
+#' @param substrates_dt An enzymatic preference data.table. 
+#'
+#' @return A ggplot2 object.
+#' @export
+#'
 peptide_intersect <- function(substrates_dt){
   intersect_var = "replicate"
   sample_key <- unique(substrates_dt[, ..intersect_var])[[1]]
@@ -120,6 +136,20 @@ peptide_intersect <- function(substrates_dt){
   
 }
 
+#' Create a PSSM volcano plot
+#'
+#' @param pssm A list containing two data tables: 1) Exact Test P-values
+#'  and 2) Fisher Exact Odds.
+#'  
+#' @param odds_cutoff The log 2 odds ratio threshold for being considered 
+#' significant. If not specified it is set to 0.5 automatically.
+#' 
+#' @param pval_cutoff The threshold p-value to be considered significant. 
+#' If not specified it is set to 0.05 automatically.
+#'
+#' @return A ggplot2 object
+#' @export
+#'
 pssm_volcano <- function(pssm, odds_cutoff = NULL, pval_cutoff = NULL){
   if (is.null(odds_cutoff)){
     odds_cutoff <- 0.5
@@ -143,6 +173,19 @@ pssm_volcano <- function(pssm, odds_cutoff = NULL, pval_cutoff = NULL){
   
 }
 
+#' Create heatmap of PSSM data
+#'
+#' @param substrates_dt An enzymatic preference data.table. 
+#' 
+#' @param scramble A logical value indicating whether the rows should be 
+#' randomly shuffled. Set to FALSE by default.
+#' 
+#' @param seed An arbitrary value to generate reproducible random numbers. 
+#' Only needed in cases where scramble is set to TRUE.
+#'
+#' @return A ggplot2 object.
+#' @export
+#'
 substrates_heatmap <- function(substrates_dt, scramble = FALSE, seed = NULL){
   if (is.null(seed)){
     seed = 42
@@ -172,6 +215,7 @@ substrates_heatmap <- function(substrates_dt, scramble = FALSE, seed = NULL){
   }
   return(aa_heatmap_plot)  
 }
+
 
 silico_heatmap <- function(output_dt){
   dm_palette <- colorRampPalette(c("#FFFFFF", "#FFB7B4", "#FF6361", "#FF3127"))
@@ -213,6 +257,18 @@ plot_activity<- function(output_dt, kinase_set){
                  strip.text = element_text(face="bold", size = 12)) 
 }
 
+#' Plot amino acid properties across the flank sequence
+#'
+#' @param substrates_dt An enzymatic preference data.table. 
+#' 
+#' @param uniprot_dt A data.table containing in silico negative peptide 
+#' sequences for each `uniprot_id` found in the `substrates_dt` file.
+#' 
+#' @param path The file path where output data should be saved.
+#'
+#' @return A ggplot2 object.
+#' @export
+#'
 substrates_property <- function(substrates_dt, uniprot_dt, path){
   property = c("property_chemical", "property_hydropathy", "property_volume", 
               "property_polar")

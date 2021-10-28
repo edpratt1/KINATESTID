@@ -292,6 +292,10 @@ It also accepts the following parameters:
 * `type`: Accepts either `aa` or `aa_property`. `aa` scores peptides based on 
           fisher odds for each amino acid and `aa_property` scores peptides 
           based on general aa properties.
+* `norm_method`: Accepts either `none` or `bkgrnd`to indicate whether raw scores
+or background-corrected ones should be used. Background-correction subtracts
+the mean and divides by the standard deviation of the negative control 
+substrate scores.
 * `property`: Define amino acid property type to be analyzed. Set to NULL by 
               default.
           
@@ -303,7 +307,7 @@ screener <- multi_screener(screener_raw, screener_uniprot,
                            pval_corr = FALSE,
                            type = "aa",
                            norm_method = "none",
-                           constrain = 0.95)
+                           constrain = 0.90)
 ```
 
 For each kinase, an optimal threshold will be calculated to separate the 
@@ -362,7 +366,6 @@ wrapped under the `generate_substrates` function.
 ```{r eval=FALSE, warning=FALSE, message=FALSE, error=FALSE, results='hide'}
 candidates <- generate_substrates(pssm, uniprot, screener, 
                                   target_kinase = "BTK",
-                                  method = "prod",
                                   screening_kinase = "ALL",
                                   n_hits = 10)
 
@@ -376,7 +379,7 @@ candidates <- generate_substrates(pssm, uniprot, screener,
 
 The output is a list containing four elements:
 
-1. A list of amino acids used for permutation when creating candiate substrates.
+1. A list of amino acids used for permutation when creating candidate substrates.
     + `sig_pos`: The number of residues which were statistically significant 
                  (p <= 0.05) at that position
 2. *In silico* screen for activity against panel of kinases indicated by the 
@@ -562,7 +565,7 @@ head(old_peptides)
 # 6:                U4    ALL        -4          D    D:-4
 ```
 ```{r eval=FALSE}
-scores <- multi_candidate_screener(screener, old_peptides, "ALL", "prod", FALSE)
+scores <- multi_candidate_screener(screener, old_peptides, "ALL", FALSE)
 head(scores)
 #        kinase active     perf      score   cutpoint substrate_barcode n_active
 #     1:    ABL   TRUE   medium   4.686755   2.696951                U6       11
