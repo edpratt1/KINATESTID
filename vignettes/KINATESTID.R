@@ -14,7 +14,3 @@ knitr::opts_chunk$set(
 ## ----results="hide", warning=FALSE, message=FALSE-----------------------------
 library(KINATESTID)
 
-## ----results="hide", warning=FALSE, message=FALSE, include=FALSE--------------
-library(kableExtra)
-library(magrittr)
-

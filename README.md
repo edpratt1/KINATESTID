@@ -4,6 +4,8 @@
 # KINATESTID
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/edpratt1/KINATESTID/workflows/R-CMD-check/badge.svg)](https://github.com/edpratt1/KINATESTID/actions)
 <!-- badges: end -->
 
 # Introduction
@@ -168,16 +170,16 @@ Part of the processed `btk_kalip` dataset is shown below:
 <thead>
 <tr>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-substrate\_barcode
+substrate_barcode
 </th>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-file\_name
+file_name
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 Row
 </th>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
-uniprot\_id
+uniprot_id
 </th>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 Protein
@@ -268,7 +270,7 @@ sample
 ——-YIDQEEEL
 </td>
 <td style="text-align:left;">
-BTK\_PLUS\_R1\_protein-peptides.csv
+BTK_PLUS_R1_protein-peptides.csv
 </td>
 <td style="text-align:right;">
 324
@@ -277,7 +279,7 @@ BTK\_PLUS\_R1\_protein-peptides.csv
 P07900
 </td>
 <td style="text-align:left;">
-HS90A\_HUMAN
+HS90A_HUMAN
 </td>
 <td style="text-align:left;">
 Y
@@ -363,7 +365,7 @@ Y(+79.97)IDQEELNK
                             ——-YIDQEEEL
                             </td>
                             <td style="text-align:left;">
-                            BTK\_PLUS\_R1\_protein-peptides.csv
+                            BTK_PLUS_R1_protein-peptides.csv
                             </td>
                             <td style="text-align:right;">
                             452
@@ -372,7 +374,7 @@ Y(+79.97)IDQEELNK
                             P08238
                             </td>
                             <td style="text-align:left;">
-                            HS90B\_HUMAN
+                            HS90B_HUMAN
                             </td>
                             <td style="text-align:left;">
                             Y
@@ -458,7 +460,7 @@ Y(+79.97)IDQEELNK
                                                         ——-YIDQEEEL
                                                         </td>
                                                         <td style="text-align:left;">
-                                                        BTK\_PLUS\_R1\_run2\_protein-peptides.csv
+                                                        BTK_PLUS_R1_run2_protein-peptides.csv
                                                         </td>
                                                         <td style="text-align:right;">
                                                         463
@@ -467,7 +469,7 @@ Y(+79.97)IDQEELNK
                                                         P08238
                                                         </td>
                                                         <td style="text-align:left;">
-                                                        HS90B\_HUMAN
+                                                        HS90B_HUMAN
                                                         </td>
                                                         <td style="text-align:left;">
                                                         Y
@@ -554,7 +556,7 @@ Y(+79.97)IDQEELNK
                                                                                     ——-YIDQEEEL
                                                                                     </td>
                                                                                     <td style="text-align:left;">
-                                                                                    BTK\_PLUS\_R1\_run2\_protein-peptides.csv
+                                                                                    BTK_PLUS_R1_run2_protein-peptides.csv
                                                                                     </td>
                                                                                     <td style="text-align:right;">
                                                                                     661
@@ -563,7 +565,7 @@ Y(+79.97)IDQEELNK
                                                                                     P07900
                                                                                     </td>
                                                                                     <td style="text-align:left;">
-                                                                                    HS90A\_HUMAN
+                                                                                    HS90A_HUMAN
                                                                                     </td>
                                                                                     <td style="text-align:left;">
                                                                                     Y
@@ -650,7 +652,7 @@ Y(+79.97)IDQEELNK
                                                                                                                 ——-YIDQEEEL
                                                                                                                 </td>
                                                                                                                 <td style="text-align:left;">
-                                                                                                                BTK\_PLUS\_R2\_protein-peptides.csv
+                                                                                                                BTK_PLUS_R2_protein-peptides.csv
                                                                                                                 </td>
                                                                                                                 <td style="text-align:right;">
                                                                                                                 141
@@ -659,7 +661,7 @@ Y(+79.97)IDQEELNK
                                                                                                                 P08238
                                                                                                                 </td>
                                                                                                                 <td style="text-align:left;">
-                                                                                                                HS90B\_HUMAN
+                                                                                                                HS90B_HUMAN
                                                                                                                 </td>
                                                                                                                 <td style="text-align:left;">
                                                                                                                 Y
@@ -746,7 +748,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                             ——-YIDQEEEL
                                                                                                                                             </td>
                                                                                                                                             <td style="text-align:left;">
-                                                                                                                                            BTK\_PLUS\_R2\_protein-peptides.csv
+                                                                                                                                            BTK_PLUS_R2_protein-peptides.csv
                                                                                                                                             </td>
                                                                                                                                             <td style="text-align:right;">
                                                                                                                                             286
@@ -755,7 +757,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                             P07900
                                                                                                                                             </td>
                                                                                                                                             <td style="text-align:left;">
-                                                                                                                                            HS90A\_HUMAN
+                                                                                                                                            HS90A_HUMAN
                                                                                                                                             </td>
                                                                                                                                             <td style="text-align:left;">
                                                                                                                                             Y
@@ -842,7 +844,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                                                         ——-YIDQEEEL
                                                                                                                                                                         </td>
                                                                                                                                                                         <td style="text-align:left;">
-                                                                                                                                                                        BTK\_PLUS\_R3\_protein-peptides.csv
+                                                                                                                                                                        BTK_PLUS_R3_protein-peptides.csv
                                                                                                                                                                         </td>
                                                                                                                                                                         <td style="text-align:right;">
                                                                                                                                                                         219
@@ -851,7 +853,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                                                         P08238
                                                                                                                                                                         </td>
                                                                                                                                                                         <td style="text-align:left;">
-                                                                                                                                                                        HS90B\_HUMAN
+                                                                                                                                                                        HS90B_HUMAN
                                                                                                                                                                         </td>
                                                                                                                                                                         <td style="text-align:left;">
                                                                                                                                                                         Y
@@ -938,7 +940,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                                                                                     ——-YIDQEEEL
                                                                                                                                                                                                     </td>
                                                                                                                                                                                                     <td style="text-align:left;">
-                                                                                                                                                                                                    BTK\_PLUS\_R3\_protein-peptides.csv
+                                                                                                                                                                                                    BTK_PLUS_R3_protein-peptides.csv
                                                                                                                                                                                                     </td>
                                                                                                                                                                                                     <td style="text-align:right;">
                                                                                                                                                                                                     352
@@ -947,7 +949,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                                                                                     P07900
                                                                                                                                                                                                     </td>
                                                                                                                                                                                                     <td style="text-align:left;">
-                                                                                                                                                                                                    HS90A\_HUMAN
+                                                                                                                                                                                                    HS90A_HUMAN
                                                                                                                                                                                                     </td>
                                                                                                                                                                                                     <td style="text-align:left;">
                                                                                                                                                                                                     Y
@@ -1034,7 +1036,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                                                                                                                 ——DYEEIGPPS
                                                                                                                                                                                                                                 </td>
                                                                                                                                                                                                                                 <td style="text-align:left;">
-                                                                                                                                                                                                                                BTK\_PLUS\_R2\_protein-peptides.csv
+                                                                                                                                                                                                                                BTK_PLUS_R2_protein-peptides.csv
                                                                                                                                                                                                                                 </td>
                                                                                                                                                                                                                                 <td style="text-align:right;">
                                                                                                                                                                                                                                 4496
@@ -1043,7 +1045,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                                                                                                                 P61158
                                                                                                                                                                                                                                 </td>
                                                                                                                                                                                                                                 <td style="text-align:left;">
-                                                                                                                                                                                                                                ARP3\_HUMAN
+                                                                                                                                                                                                                                ARP3_HUMAN
                                                                                                                                                                                                                                 </td>
                                                                                                                                                                                                                                 <td style="text-align:left;">
                                                                                                                                                                                                                                 Y
@@ -1130,7 +1132,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                                                                                                                                         ——DYFEQYGGK
                                                                                                                                                                                                                                                         </td>
                                                                                                                                                                                                                                                         <td style="text-align:left;">
-                                                                                                                                                                                                                                                        BTK\_PLUS\_R2\_protein-peptides.csv
+                                                                                                                                                                                                                                                        BTK_PLUS_R2_protein-peptides.csv
                                                                                                                                                                                                                                                         </td>
                                                                                                                                                                                                                                                         <td style="text-align:right;">
                                                                                                                                                                                                                                                         1113
@@ -1139,7 +1141,7 @@ Y(+79.97)IDQEELNK
                                                                                                                                                                                                                                                         F8W6I7
                                                                                                                                                                                                                                                         </td>
                                                                                                                                                                                                                                                         <td style="text-align:left;">
-                                                                                                                                                                                                                                                        F8W6I7\_HUMAN
+                                                                                                                                                                                                                                                        F8W6I7_HUMAN
                                                                                                                                                                                                                                                         </td>
                                                                                                                                                                                                                                                         <td style="text-align:left;">
                                                                                                                                                                                                                                                         Y
@@ -1325,7 +1327,7 @@ sequence), they will not be ignored during peptide scoring.
 ### Analyzing Amino Acid Properties
 
 A similar analysis can be run based on amino acid *properties* instead
-of individual residues using the `type` “aa\_property”.
+of individual residues using the `type` “aa_property”.
 
 ``` r
 pssm <- substrate_fisher_test(substrates_dt = uniq_subs, uniprot_dt = uniprot,
@@ -1350,14 +1352,18 @@ peptide library. It also accepts the following parameters:
 
 -   `path`: the file path where output data should be saved.
 -   `method`: Peptide scoring algorithim. Accepts product of odds ratios
-    (“prod”), weighted product of odds ratio (“w\_prod”), and the sum of
-    log scores (“log2\_sum”).
+    (“prod”), weighted product of odds ratio (“w_prod”), and the sum of
+    log scores (“log2_sum”).
 -   `pval_corr`: a logical parameter where TRUE will set all fisher odds
-    with non-significant p-values (&gt; 0.05) to 1. Set to FALSE by
+    with non-significant p-values (> 0.05) to 1. Set to FALSE by
     default.
 -   `type`: Accepts either `aa` or `aa_property`. `aa` scores peptides
     based on fisher odds for each amino acid and `aa_property` scores
     peptides based on general aa properties.
+-   `norm_method`: Accepts either `none` or `bkgrnd`to indicate whether
+    raw scores or background-corrected ones should be used.
+    Background-correction subtracts the mean and divides by the standard
+    deviation of the negative control substrate scores.
 -   `property`: Define amino acid property type to be analyzed. Set to
     NULL by default.
 
@@ -1366,7 +1372,9 @@ screener <- multi_screener(screener_raw, screener_uniprot,
                            path = output_dir,
                            method = "prod",
                            pval_corr = FALSE,
-                           type = "aa")
+                           type = "aa",
+                           norm_method = "none",
+                           constrain = 0.90)
 ```
 
 For each kinase, an optimal threshold will be calculated to separate the
@@ -1423,7 +1431,6 @@ specificity are wrapped under the `generate_substrates` function.
 ``` r
 candidates <- generate_substrates(pssm, uniprot, screener, 
                                   target_kinase = "BTK",
-                                  method = "prod",
                                   screening_kinase = "ALL",
                                   n_hits = 10)
 ```
@@ -1436,13 +1443,13 @@ candidates <- generate_substrates(pssm, uniprot, screener,
 
 The output is a list containing four elements:
 
-1.  A list of amino acids used for permutation when creating candiate
+1.  A list of amino acids used for permutation when creating candidate
     substrates.
     -   `sig_pos`: The number of residues which were statistically
-        significant (p &lt;= 0.05) at that position
+        significant (p \<= 0.05) at that position
 2.  *In silico* screen for activity against panel of kinases indicated
     by the user.
-    -   `active`: If the substrate score is &gt; than the threshold, it
+    -   `active`: If the substrate score is > than the threshold, it
         will be marked as active for that enzyme.
     -   `perf`: Predicted performance is split into “low”, “medium”, and
         “high” based on the peptide scoring falling above the 10th, 50th
@@ -1450,7 +1457,7 @@ The output is a list containing four elements:
     -   `n_active`: The total number of kinases marked as “active” based
         on the criteria above.
 3.  Table of candidate peptide substrates in order of raw score.
-4.  The top `n_hits` substrates scored to be active for \`target\_kinase
+4.  The top `n_hits` substrates scored to be active for \`target_kinase
     and the lowest substrate scores for all other kinases in the
     screener panel.
 
@@ -1622,7 +1629,7 @@ old_peptides <- na.omit(old_peptides)
     # 6:                U4    ALL        -4          D    D:-4
 
 ``` r
-scores <- multi_candidate_screener(screener, old_peptides, "ALL", "prod", FALSE)
+scores <- multi_candidate_screener(screener, old_peptides, "ALL", FALSE)
 head(scores)
 #        kinase active     perf      score   cutpoint substrate_barcode n_active
 #     1:    ABL   TRUE   medium   4.686755   2.696951                U6       11
@@ -1683,9 +1690,9 @@ The `norm_scores` function output is a list of two elements:
 
 ``` r
 sessionInfo()
-#> R version 4.1.0 (2021-05-18)
+#> R version 4.1.2 (2021-11-01)
 #> Platform: x86_64-w64-mingw32/x64 (64-bit)
-#> Running under: Windows 10 x64 (build 19042)
+#> Running under: Windows 10 x64 (build 19043)
 #> 
 #> Matrix products: default
 #> 
@@ -1701,41 +1708,42 @@ sessionInfo()
 #> [8] base     
 #> 
 #> other attached packages:
-#>  [1] magrittr_2.0.1         kableExtra_1.3.4       KINATESTID_2.0.1      
-#>  [4] stringr_1.4.0          VennDiagram_1.6.20     futile.logger_1.4.3   
-#>  [7] RColorBrewer_1.1-2     reshape2_1.4.4         patchwork_1.1.1       
-#> [10] pheatmap_1.0.12        ggplotify_0.0.7        EnhancedVolcano_1.10.0
-#> [13] ggrepel_0.9.1          ggplot2_3.3.3          data.table_1.14.0     
-#> [16] cutpointr_1.1.0        cowplot_1.1.1          devtools_2.4.1        
-#> [19] usethis_2.0.1         
+#>  [1] magrittr_2.0.2         kableExtra_1.3.4       KINATESTID_2.1.1      
+#>  [4] DT_0.20                shiny_1.7.1            stringr_1.4.0         
+#>  [7] VennDiagram_1.7.1      futile.logger_1.4.3    RColorBrewer_1.1-2    
+#> [10] reshape2_1.4.4         patchwork_1.1.1        pheatmap_1.0.12       
+#> [13] ggplotify_0.1.0        EnhancedVolcano_1.12.0 ggrepel_0.9.1         
+#> [16] ggplot2_3.3.5          data.table_1.14.2      cutpointr_1.1.1       
+#> [19] cowplot_1.1.1          devtools_2.4.3         usethis_2.1.5         
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] fs_1.5.0             webshot_0.5.2        ash_1.0-15          
-#>  [4] httr_1.4.2           rprojroot_2.0.2      tools_4.1.0         
-#>  [7] utf8_1.2.1           R6_2.5.0             KernSmooth_2.23-20  
-#> [10] vipor_0.4.5          DBI_1.1.1            colorspace_2.0-1    
-#> [13] withr_2.4.2          tidyselect_1.1.1     prettyunits_1.1.1   
-#> [16] ggrastr_0.2.3        processx_3.5.2       ggalt_0.4.0         
-#> [19] compiler_4.1.0       extrafontdb_1.0      cli_2.5.0           
-#> [22] rvest_1.0.0          formatR_1.11         xml2_1.3.2          
-#> [25] desc_1.3.0           scales_1.1.1         proj4_1.0-10.1      
-#> [28] callr_3.7.0          systemfonts_1.0.2    digest_0.6.27       
-#> [31] svglite_2.0.0        rmarkdown_2.8        pkgconfig_2.0.3     
-#> [34] htmltools_0.5.1.1    extrafont_0.17       sessioninfo_1.1.1   
-#> [37] highr_0.9            fastmap_1.1.0        maps_3.3.0          
-#> [40] rlang_0.4.11         rstudioapi_0.13      gridGraphics_0.5-1  
-#> [43] generics_0.1.0       dplyr_1.0.6          Rcpp_1.0.6          
-#> [46] ggbeeswarm_0.6.0     munsell_0.5.0        fansi_0.4.2         
-#> [49] lifecycle_1.0.0      stringi_1.6.1        yaml_2.2.1          
-#> [52] MASS_7.3-54          pkgbuild_1.2.0       plyr_1.8.6          
-#> [55] crayon_1.4.1         knitr_1.33           ps_1.6.0            
-#> [58] pillar_1.6.1         codetools_0.2-18     pkgload_1.2.1       
-#> [61] futile.options_1.0.1 glue_1.4.2           evaluate_0.14       
-#> [64] lambda.r_1.2.4       remotes_2.4.0        BiocManager_1.30.15 
-#> [67] vctrs_0.3.8          foreach_1.5.1        testthat_3.0.2      
-#> [70] Rttf2pt1_1.3.8       gtable_0.3.0         purrr_0.3.4         
-#> [73] assertthat_0.2.1     cachem_1.0.5         xfun_0.23           
-#> [76] viridisLite_0.4.0    tibble_3.1.2         iterators_1.0.13    
-#> [79] rvcheck_0.1.8        beeswarm_0.4.0       memoise_2.0.0       
-#> [82] ellipsis_0.3.2
+#>  [1] fs_1.5.2             webshot_0.5.2        httr_1.4.2          
+#>  [4] ash_1.0-15           rprojroot_2.0.2      tools_4.1.2         
+#>  [7] utf8_1.2.2           R6_2.5.1             KernSmooth_2.23-20  
+#> [10] vipor_0.4.5          colorspace_2.0-2     withr_2.4.3         
+#> [13] tidyselect_1.1.1     prettyunits_1.1.1    ggrastr_1.0.1       
+#> [16] processx_3.5.2       ggalt_0.4.0          compiler_4.1.2      
+#> [19] extrafontdb_1.0      rvest_1.0.2          cli_3.1.1           
+#> [22] formatR_1.11         xml2_1.3.3           desc_1.4.0          
+#> [25] scales_1.1.1         proj4_1.0-11         callr_3.7.0         
+#> [28] systemfonts_1.0.3    digest_0.6.29        yulab.utils_0.0.4   
+#> [31] svglite_2.0.0        rmarkdown_2.11       pkgconfig_2.0.3     
+#> [34] htmltools_0.5.2      extrafont_0.17       sessioninfo_1.2.2   
+#> [37] highr_0.9            fastmap_1.1.0        maps_3.4.0          
+#> [40] htmlwidgets_1.5.4    rlang_1.0.0          rstudioapi_0.13     
+#> [43] gridGraphics_0.5-1   generics_0.1.1       dplyr_1.0.7         
+#> [46] Rcpp_1.0.8           ggbeeswarm_0.6.0     munsell_0.5.0       
+#> [49] fansi_1.0.2          lifecycle_1.0.1      stringi_1.7.6       
+#> [52] yaml_2.2.2           MASS_7.3-54          brio_1.1.3          
+#> [55] pkgbuild_1.3.1       plyr_1.8.6           promises_1.2.0.1    
+#> [58] crayon_1.4.2         knitr_1.37           ps_1.6.0            
+#> [61] pillar_1.6.5         codetools_0.2-18     pkgload_1.2.4       
+#> [64] futile.options_1.0.1 glue_1.6.1           evaluate_0.14       
+#> [67] lambda.r_1.2.4       remotes_2.4.2        vctrs_0.3.8         
+#> [70] httpuv_1.6.5         foreach_1.5.1        testthat_3.1.2      
+#> [73] Rttf2pt1_1.3.9       gtable_0.3.0         purrr_0.3.4         
+#> [76] cachem_1.0.6         xfun_0.29            mime_0.12           
+#> [79] xtable_1.8-4         later_1.3.0          viridisLite_0.4.0   
+#> [82] tibble_3.1.6         iterators_1.0.13     beeswarm_0.4.0      
+#> [85] memoise_2.0.1        ellipsis_0.3.2
 ```

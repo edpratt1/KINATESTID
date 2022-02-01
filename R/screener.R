@@ -1,55 +1,19 @@
-#' Generate enzyme screener file
-#' 
-#' @description The function multi_screener takes as inputs 1) 
-#' the kinase-specific preferred substrates file and 2) the protein-matched 
-#' in silico control peptide library. For each enzyme, an optimal threshold will
-#' be calculated to separate the peptide scores of sample vs control 
-#' sequences. This is calculated using the package `cutpointr.` A bootstrap model
-#'  is used to select an optimal cutpoint to maximize sensitivity.
-#'    
-#' @param screener_input An enzyme-specific preferred substrates file. 
-#' 
-#' @param uniprot_input The `uniprot_id`-matched in silico control peptide library.
-#' 
-#' @param path  The file path where output data should be saved.
-#' 
-#' @param method Peptide scoring algorithm. Accepts product of odds ratios 
-#' (`prod`), weighted product of odds ratio (`w_prod`), and the sum of 
-#' log scores (`log2_sum`).
-#' 
-#' @param pval_corr A logical parameter where TRUE will set all fisher odds 
-#' with non-significant p-values (> 0.05) to 1. Set to FALSE by default.
-#' 
-#' @param type Character of either `aa` or `aa_property` to indicate whether 
-#' amino acid residues or amino acid properties should be used.
-#' 
-#' @param norm_method Character of either `none` or `bkgrnd` to indicate whether 
-#' raw scores or background-corrected ones should be used. Background-correction
-#' subtracts the mean and divides by the standard deviation of the negative 
-#' control substrate scores.
-#' 
-#' @param property Character indicating which amino acid property should be 
-#' analyzed. Only used if type = `aa`. See available property options 
-#' by typing `aa_classificiation`.
-#' 
-#' @param constrain The minimum specificity required when calculating 
-#' the threshold score for activity. By default set to 0.9.
+#' Title
 #'
-#' @return A three-element list containing: 1) A lot of score distributions and
-#' the selected threshold, 2) Fisher tables for each kinase in the 
-#' `screener_input` file, and 3) Summary stats on score distribution for 
-#' each enzyme.
+#' @param screener_input 
+#' @param uniprot_input 
+#' @param path 
+#' @param method 
+#' @param pval_corr 
+#' @param type 
+#' @param norm_method 
+#' @param property 
+#' @param constrain 
+#'
+#' @return
 #' @export
 #'
 #' @examples
-#' screener <- multi_screener(screener_raw, screener_uniprot, 
-#'                            path = output_dir,
-#'                            method = "prod",
-#'                            pval_corr = FALSE,
-#'                            type = "aa",
-#'                            norm_method = "none",
-#'                            constrain = 0.90)
-#'                            
 multi_screener <- function(screener_input, 
                            uniprot_input, 
                            path, 
@@ -122,7 +86,7 @@ multi_screener <- function(screener_input,
                             method = maximize_boot_metric, 
                             boot_stratify = TRUE, 
                             boot_cut = 30, 
-                            boot_runs = 10,
+                            boot_runs = 20,
                             metric = sens_constrain, 
                             constrain_metric = specificity,
                             min_constrain = constrain)
@@ -223,6 +187,20 @@ multi_screener <- function(screener_input,
   return(output)
 }
 
+#' Title
+#'
+#' @param kinase_dt 
+#' @param kinase_uniprot 
+#' @param method 
+#' @param pval_corr 
+#' @param type 
+#' @param property 
+#' @param constrain 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 screener_cutpoint <- function(kinase_dt, 
                               kinase_uniprot, 
                               method = c("prod", "log2_sum", "w_prod"), 
@@ -275,6 +253,21 @@ screener_cutpoint <- function(kinase_dt,
   return(output)
 }
 
+#' Title
+#'
+#' @param kinase_dt 
+#' @param kinase_uniprot 
+#' @param method 
+#' @param pval_corr 
+#' @param type 
+#' @param norm_method 
+#' @param property 
+#' @param verbose 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 make_scorematrix <- function(kinase_dt, kinase_uniprot, 
                              method = c("prod", "log2_sum", "w_prod"), 
                              pval_corr = FALSE, 
@@ -381,17 +374,12 @@ make_scorematrix <- function(kinase_dt, kinase_uniprot,
   }
 }
 
-#' Create new input screener file
+#' Title
 #'
-#' @description This function allows the user to open a single folder containing
-#' all enzyme substrate preference sheets and create a new input file for 
-#' screener creation. The user should also create a new negative control 
-#' input using `import_uniprot`.
-#' 
-#' @return A data.table containing the substrate preferences for all 
-#' enzyme preference files in a selected folder.
+#' @return
 #' @export
 #'
+#' @examples
 make_screener <- function(){
   expt_file_key <- "KALIP"
   path <- choose.dir()

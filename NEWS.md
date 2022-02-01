@@ -1,5 +1,11 @@
 # KINATESTID (development version)
 
+# KINATESTID 2.1.1
+
+### Minor improvements and bug fixes
+* Re-build with bug fix so provided data files (e.g. ptm_key, screener_raw) 
+don't have to be manually imported.
+
 # KINATESTID 2.1.0
 
 ### New features
